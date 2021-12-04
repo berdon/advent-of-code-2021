@@ -34,6 +34,7 @@ namespace Problem03 {
     (async() => {
         // ### Part 1
         const data = await getInputDataAsync()
+        var startTime = performance.now()
         const empty: number[] = Array(data[0].length).fill(0)
         // Map each bit on to a number and increment the number or decrement the number if the bit is 1 or 0
         // Then update this number for each value in the input data
@@ -61,9 +62,11 @@ namespace Problem03 {
             epsilon |= invBitValue(gammaBits[gammaBits.length - 1 - position]) << position
         }
 
-        console.log(`Part 1: Product of gamma and epsilon is ${gamma * epsilon}; (${gamma} x ${epsilon})`);
+        var elapsed = (performance.now() - startTime).toFixed(2)
+        console.log(`Part 1: Product of gamma and epsilon is ${gamma * epsilon}; (${gamma} x ${epsilon}) (${elapsed} ms)`);
 
         // ### Part 2
+        startTime = performance.now()
         var oxygenDataSet = data;
         var co2DataSet = data;
         for (var bitIndex = 0; bitIndex < data[0].length; bitIndex++) {
@@ -93,8 +96,9 @@ namespace Problem03 {
 
         var oxygenGeneratorRating = bitStringToDecimal(oxygenDataSet[0])
         var co2ScrubberRating = bitStringToDecimal(co2DataSet[0])
+        elapsed = (performance.now() - startTime).toFixed(2)
         console.log(`Part 2: Oxygen Generator Rating = ${oxygenGeneratorRating}, CO2 Scrubber Rating = ${co2ScrubberRating}`)
-        console.log(`        Life Support Rating is ${oxygenGeneratorRating * co2ScrubberRating}`)
+        console.log(`        Life Support Rating is ${oxygenGeneratorRating * co2ScrubberRating} (${elapsed} ms)`)
     })();
 
     async function submitAnswerAsync(value: string, part: string) {

@@ -17,6 +17,7 @@ namespace Problem02 {
     (async() => {
         // ### Part 1
         const data = await getInputDataAsync()
+        var startTime = performance.now()
         var horizontalPosition = 0
         var depth = 0
         data.forEach(command => {
@@ -26,9 +27,11 @@ namespace Problem02 {
                 case "up": depth -= command.amount; break
             }
         })
-        console.log(`Part 1: Product of position and depth is ${horizontalPosition * depth} (${horizontalPosition} x ${depth})`)
+        var elapsed = (performance.now() - startTime).toFixed(2)
+        console.log(`Part 1: Product of position and depth is ${horizontalPosition * depth} (${elapsed} ms)`)
 
         // ### Part 2
+        startTime = performance.now()
         var horizontalPosition = 0
         var depth = 0
         var aim = 0
@@ -42,7 +45,8 @@ namespace Problem02 {
                 case "up": aim -= command.amount; break
             }
         })
-        console.log(`Part 2: Product of position and depth is ${horizontalPosition * depth} (${horizontalPosition} x ${depth})`)
+        elapsed = (performance.now() - startTime).toFixed(2)
+        console.log(`Part 2: Product of position and depth is ${horizontalPosition * depth} (${horizontalPosition} x ${depth}) (${elapsed} ms)`)
     })();
 
     async function submitAnswerAsync(value: string, part: string) {

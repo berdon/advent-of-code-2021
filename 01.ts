@@ -9,6 +9,7 @@ namespace Problem01 {
     (async() => {
         // ### Part 1
         const depthReadings = await getInputDataAsync()
+        var startTime = performance.now()
         const increasedReadings = depthReadings
             .map((value, index, values) => { return {
                 previous: index > 0 ? values[index - 1] : null,
@@ -16,9 +17,11 @@ namespace Problem01 {
             }})
             .map(pair => pair.previous != null && pair.previous < pair.current ? { value: pair.current, increased: true } : { value: pair.current, increased: false })
         const increases = increasedReadings.reduce((previous, current) => previous + (current.increased ? 1 : 0), 0)
-        console.log(`Part 1: ${increases} increases observed of ${depthReadings.length} depth values`)
+        var elapsed = (performance.now() - startTime).toFixed(2)
+        console.log(`Part 1: ${increases} increases observed of ${depthReadings.length} depth values (${elapsed} ms)`)
 
         // ### Part 2
+        startTime = performance.now()
         const windowedDepths = depthReadings
             .map((value, index, values) => {return {
                 current: value,
@@ -32,7 +35,8 @@ namespace Problem01 {
         const windowedReadings = windowedDepths
             .map(pair => pair.previous != null && pair.previous < pair.current ? { value: pair.current, increased: true } : { value: pair.current, increased: false })
         const windowedIncreases = windowedReadings.reduce((previous, current) => previous + (current.increased ? 1 : 0), 0)
-        console.log(`Part 2: ${windowedIncreases} increases observed of ${depthReadings.length} depth values`)
+        var elapsed = (performance.now() - startTime).toFixed(2)
+        console.log(`Part 2: ${windowedIncreases} increases observed of ${depthReadings.length} depth values (${elapsed} ms)`)
     })();
 
     async function getInputDataAsync(): Promise<number[]> {

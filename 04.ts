@@ -107,18 +107,19 @@ namespace Problem04 {
 
     (async() => {
         // ### Part 1
-        var data = await getInputDataAsync()
+        var { startTime, data } = await getInputDataAsync()
         // Iterate through all input and find a winning board
         var winningBoard: Board|undefined
         data.InputData.find(input => {
             winningBoard = data.Boards.find(board => board.acceptInput(input))
             return !!winningBoard
         })
-        console.log(`Part 1: Score of winning board is ${winningBoard?.score}`)
+        var elapsed = (performance.now() - startTime).toFixed(2)
+        console.log(`Part 1: Score of winning board is ${winningBoard?.score} (${elapsed} ms)`)
 
         // ### Part 2
-        data = await getInputDataAsync()
         // Iterate through all input and find a winning board
+        startTime = performance.now()
         var winningBoard: Board|undefined
         data.InputData.find(input => {
             winningBoard = data.Boards
@@ -126,7 +127,8 @@ namespace Problem04 {
                 .find((board, index, values) => board.acceptInput(input) && values.length == 1)
             return !!winningBoard
         })
-        console.log(`Part 2: Score of last winning board is ${winningBoard?.score}`)
+        elapsed = (performance.now() - startTime).toFixed(2)
+        console.log(`Part 2: Score of last winning board is ${winningBoard?.score} (${elapsed} ms)`)
     })();
 
     async function submitAnswerAsync(value: string, part: string) {
@@ -141,7 +143,7 @@ namespace Problem04 {
         }
     }
 
-    async function getInputDataAsync(): Promise<{InputData: number[], Boards: Board[]}> {
+    async function getInputDataAsync(): Promise<{ startTime: number, data: {InputData: number[], Boards: Board[]}}> {
         var lines: string[]
         if (DEBUG) {
             lines = SAMPLE_DATA.split('\n').filter(line => line != "")
@@ -150,6 +152,8 @@ namespace Problem04 {
             const response = await got.default(URI_INPUT, { headers: { Cookie: AOC_AUTHN_COOKIES } })
             lines = response.body.split('\n').filter(line => line != "")
         }
+
+        var startTime = performance.now()
 
         var randomInputLine = lines.shift()!
         var randomInput = randomInputLine.trim().split(',').map(x => parseInt(x.trim()))
@@ -167,6 +171,6 @@ namespace Problem04 {
                 }
             })
 
-        return { InputData: randomInput, Boards: boards }
+        return { startTime: startTime, data: { InputData: randomInput, Boards: boards } }
     }
 }
