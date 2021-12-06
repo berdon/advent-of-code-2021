@@ -1,3 +1,4 @@
 out
 authtoken.json
 node_modules
+day-template.ts
