@@ -1,8 +1,10 @@
 import AOC_AUTHN_COOKIES from './authtoken.json';
 import * as got from "got"
 
-interface Array<T> {
-    movingAverage(): number;
+declare global {
+    interface Array<T> {
+        movingAverage(): number
+    }
 }
 
 Array.prototype.movingAverage = function() {
