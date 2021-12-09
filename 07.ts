@@ -1,15 +1,6 @@
 import AOC_AUTHN_COOKIES from './authtoken.json';
 import * as got from "got"
-
-declare global {
-    interface Array<T> {
-        movingAverage(): number
-    }
-}
-
-Array.prototype.movingAverage = function() {
-    return this.reduce((p, c, i, _) => (c + i * p) / (i + 1), 0)
-}
+import './collections'
 
 namespace Problem07 {
     const DAY = 7;
