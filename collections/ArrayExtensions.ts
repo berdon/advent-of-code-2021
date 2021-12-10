@@ -3,6 +3,7 @@ declare global {
         movingAverage(): number
         minIndex(cmp: { (a: T, b: T): number }): number
         minIndex(cmp: { (a: T, b: T): number }, inclusive: boolean): number
+        reduceUntil<TAcc>(cmp: { (acc: TAcc, current: T ): TAcc|null }, acc: TAcc, callback: { (acc: TAcc, current: T ): TAcc }): TAcc
     }
 }
 
@@ -22,6 +23,16 @@ Array.prototype.minIndex = function<T>(cmp: { (a: T, b: T): number }, inclusive 
     }
 
     return index
+}
+
+Array.prototype.reduceUntil = function<T, TAcc>(cmp: { (acc: TAcc, current: T ): TAcc|null }, acc: TAcc, callback: { (acc: TAcc, current: T ): TAcc }): TAcc {
+    for (var item of this) {
+        var breakResult = cmp(acc, item)
+        if (breakResult != null) return breakResult
+        acc = callback(acc, item)
+    }
+
+    return acc
 }
 
 export {}
