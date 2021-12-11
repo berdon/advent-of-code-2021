@@ -30,6 +30,7 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
         // Part 2
         var startTime = performance.now()
         var result = data.map(entry => evaluateEntry(entry)).reduce((p, c) => p + c, 0)
+        var elapsed = (performance.now() - startTime).toFixed(2)
         console.log(`Part 2: Sum of translated outputs is ${result} (${elapsed} ms)`)
     }
 

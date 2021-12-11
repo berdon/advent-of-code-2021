@@ -95,6 +95,7 @@ namespace Problem09 {
                                       .sort((a, b) => b - a)
                                       .filter((v, i, a) => i < 3)
                                       .reduce((p, c) => p * c, 1)
+        var elapsed = (performance.now() - startTime).toFixed(2)
         console.log(`Part 2: Product of the top three largest basin sizes is ${productOfTopThree} (${elapsed} ms)`)
     }
 

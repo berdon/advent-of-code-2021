@@ -112,7 +112,7 @@ namespace Problem10 {
                       .reduce((acc, c) => acc * 5 + endcapScore(c as Gate), 0))
         // Grab the middle score from the sorted list
         var middleScore = endcaps.sort((a, b) => a - b)[Math.floor(endcaps.length / 2)]
-
+        var elapsed = (performance.now() - startTime).toFixed(2)
         console.log(`Part 2: Middle endcapping score is ${middleScore} (${elapsed} ms)`)
     }
 

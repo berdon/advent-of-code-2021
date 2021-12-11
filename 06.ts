@@ -22,7 +22,7 @@ namespace Problem06 {
         for (var i = 80; i < 256; i++) {
             school.tick()
         }
-
+        var elapsed = (performance.now() - startTime).toFixed(2)
         console.log(`Part 2: There are ${school.count()} fish (${elapsed} ms)`)
     }
 
