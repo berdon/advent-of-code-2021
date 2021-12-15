@@ -30,7 +30,7 @@ CN -> C
     async function main() {
         // Part 1
         var { startTime, data } = await getInputDataAsync()
-        const { result, counts } = generateFor(20, data.template, data.mapping)
+        var { result, counts } = generateFor(10, data.template, data.mapping)
         var max = [...counts.entries()].reduce((acc, c) => c[1] > acc[1] ? c : acc, ["", Number.MIN_VALUE])
         var min = [...counts.entries()].reduce((acc, c) => c[1] < acc[1] ? c : acc, ["", Number.MAX_VALUE])
         var diff = max[1] - min[1]
@@ -40,6 +40,8 @@ CN -> C
         // Part 2
         var startTime = performance.now()
         
+        // Recalculate inital results for 20 steps which we'll use for memoization after
+        var { result, counts } = generateFor(20, data.template, data.mapping)
         // Take the current output and divide it into manageable chunks to work on 20 more times
         const runningCounts = new Map<string, number>()
         const CHUNK_SIZE = 2//data.template.length
@@ -60,7 +62,7 @@ CN -> C
                 memoized.set(chunk, nextCounts)
             }
             else {
-                //console.log("Memoized")
+                // Memoized result
                 nextCounts = memoized.get(chunk)!
             }
 
