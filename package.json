@@ -17,6 +17,7 @@
     },
     "homepage": "https://github.com/berdon/advent-of-code-2021#readme",
     "dependencies": {
-        "@types/got": "^9.6.12"
+        "@types/got": "^9.6.12",
+        "ts-priority-queue": "^0.1.1"
     }
 }
