@@ -4,6 +4,7 @@ declare global {
         except(...values: T[]): Set<T>
         except(...set: Set<T>[]): Set<T>
         contains(...set: Set<T>[]): boolean
+        intersect(...set: Set<T>[]): Set<T>
     }
 }
 
@@ -32,6 +33,14 @@ Set.prototype.contains = function<T>(...sets: Set<T>[]): boolean {
         }
     }
     return true
+}
+
+Set.prototype.intersect = function<T>(set: Set<T>): Set<T> {
+    var newSet = new Set<T>()
+    for (var value of set) {
+        if (this.has(value)) newSet.add(value)
+    }
+    return newSet
 }
 
 export { }

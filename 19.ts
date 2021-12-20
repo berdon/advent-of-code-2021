@@ -250,6 +250,8 @@ namespace Problem19 {
                 }
             }
         }
+
+        var elapsed = (performance.now() - startTime).toFixed(2)
         console.log(`Part 2: Greatest manhattan distance of ${maxDistance} occurs between ${maxBeaconA} and ${maxBeaconB} (${elapsed} ms)`)
     }
 
