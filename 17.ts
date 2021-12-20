@@ -12,8 +12,6 @@ target area: x=20..30, y=-10..-5
     async function main() {
         // Part 1
         var { startTime, data } = await getInputDataAsync()
-        var position = new Vector(0, 0)
-        var velocity = new Vector(data.x[1], 10)
         const validX = validXRange(data.x[0], data.x[1])
         const validY = validYRange(validX, data.y[0], data.y[1])
         const max = Math.max(...validY.map(y => y.height))
