@@ -1,11 +1,88 @@
-import AOC_AUTHN_COOKIES from './authtoken.json';
-import * as got from "got"
+import AocSolution from './aoc/AocSolution';
 
 namespace Problem13 {
-    const DAY = 13;
-    const DEBUG = false
-    const URI_INPUT = `https://adventofcode.com/2021/day/${DAY}/input`
-    const SAMPLE_DATA = 
+    type DataType = { folds: Fold[]; dots: Map<string, Point>; }
+    class Solution extends AocSolution<DataType> {
+        public day: string = "13"
+        protected DEBUG: boolean = false
+        protected SHOW_WORK: boolean = false
+
+        public async solvePartOneAsync(data: DataType): Promise<{ message: string, context?: any }> {
+            if (this.SHOW_WORK) console.log("Initial state")
+            if (this.SHOW_WORK) this.display(data.dots)
+            const dots = data.folds.reduce((acc, fold) => {
+                if (this.SHOW_WORK) console.log(`Fold ${fold.type} at ${fold.at}`)
+                const dots = this.performFold(fold.type, fold.at, acc.dots)
+                if (this.SHOW_WORK) this.display(dots)
+                return { dots: dots, dotCounts: [...acc.dotCounts, dots.size] }
+            }, { dots: data.dots, dotCounts: [data.dots.size] })
+            return { message: `Number of dots after fold 1 is ${dots.dotCounts[1]}`, context: dots }
+        }
+
+        public async solvePartTwoAsync(data: DataType, { dots }: { dots: Map<string, Point>; dotCounts: number[]; }): Promise<string> {
+            console.log('```bash')
+            this.display(dots)
+            console.log('```')
+            return ``
+        }
+
+        private display(dots: Map<string, Point>) {
+            const values = [...dots.values()]
+            const maxX = values.reduce((acc, c) => c.x > acc ? c.x : acc, Number.MIN_VALUE) + 1
+            const maxY = values.reduce((acc, c) => c.y > acc ? c.y : acc, Number.MIN_VALUE) + 1
+    
+            const grid = Array(maxY).fill(false).map(column => Array(maxX).fill(false))
+            values.reduce((acc, c) => {
+                acc[c.y][c.x] = true
+                return acc
+            }, grid)
+            grid.forEach(row => console.log(row.reduce((acc, c) => acc + (c ? String.fromCharCode(0x2588) : " "), "")))
+        }
+    
+        private performFold(type: FoldType, at: number, dots: Map<string, Point>): Map<string, Point> {
+            if (type == FoldType.Left) {
+                // Subtract (x - at) from each dot where x > at
+                return [...dots.values()]
+                    .filter(dot => dot.x > at)
+                    .reduce((acc, dot) => {
+                        acc.delete(dot.key)
+                        const newDot = new Point(2 * at - dot.x, dot.y)
+                        acc.set(newDot.key, newDot)
+                        return acc
+                }, new Map<string, Point>(dots))
+            }
+            else if (type == FoldType.Up) {
+                // Subtract (y - at) from each dot where y > at
+                return [...dots.values()]
+                    .filter(dot => dot.y > at)
+                    .reduce((acc, dot) => {
+                        acc.delete(dot.key)
+                        const newDot = new Point(dot.x, 2 * at - dot.y)
+                        acc.set(newDot.key, newDot)
+                        return acc
+                    }, new Map<string, Point>(dots))
+            }
+    
+            throw "Invalid fold type"
+        }
+
+        protected parseData(lines: string[]): DataType {
+            const points = lines.filter(line =>
+                line.indexOf(",") > 0)
+                    .map(line => line.split(",").map(token => parseInt(token)))
+                    .map(tokens => new Point(tokens[0], tokens[1]))
+                    .reduce((acc, c) => acc.set(c.key, c), new Map<string, Point>())
+            const folds = lines
+                .filter(line => line.startsWith("fold"))
+                .map(line =>
+                    line.slice(11).split("="))
+                        .map(tokens => tokens[0] == "y"
+                            ? new Fold(FoldType.Up, parseInt(tokens[1]))
+                            : new Fold(FoldType.Left, parseInt(tokens[1])))
+            return { folds: folds, dots: points}
+        }
+
+        protected SAMPLE_DATA: string = 
 `
 6,10
 0,14
@@ -29,67 +106,6 @@ namespace Problem13 {
 fold along y=7
 fold along x=5
 `;
-    const upperCaseRegEx = new RegExp(/^[A-Z]*$/)
-    async function main() {
-        // Part 1
-        var { startTime, data } = await getInputDataAsync()
-        var elapsed = (performance.now() - startTime).toFixed(2)
-
-        if (DEBUG) console.log("Initial state")
-        if (DEBUG) display(data.dots)
-        const dots = data.folds.reduce((acc, fold) => {
-            if (DEBUG) console.log(`Fold ${fold.type} at ${fold.at}`)
-            const dots = performFold(fold.type, fold.at, acc.dots)
-            if (DEBUG) display(dots)
-            return { dots: dots, dotCounts: [...acc.dotCounts, dots.size] }
-        }, { dots: data.dots, dotCounts: [data.dots.size] })
-
-        console.log(`Part 1: Number of dots after fold 1 is ${dots.dotCounts[1]} (${elapsed} ms)`)
-
-        // Part 2
-        console.log(`Part 2:`)
-        display(dots.dots)
-    }
-
-    function display(dots: Map<string, Point>) {
-        const values = [...dots.values()]
-        const maxX = values.reduce((acc, c) => c.x > acc ? c.x : acc, Number.MIN_VALUE) + 1
-        const maxY = values.reduce((acc, c) => c.y > acc ? c.y : acc, Number.MIN_VALUE) + 1
-
-        const grid = Array(maxY).fill(false).map(column => Array(maxX).fill(false))
-        values.reduce((acc, c) => {
-            acc[c.y][c.x] = true
-            return acc
-        }, grid)
-        grid.forEach(row => console.log(row.reduce((acc, c) => acc + (c ? "#" : " "), "")))
-        console.log("\n")
-    }
-
-    function performFold(type: FoldType, at: number, dots: Map<string, Point>): Map<string, Point> {
-        if (type == FoldType.Left) {
-            // Subtract (x - at) from each dot where x > at
-            return [...dots.values()]
-                .filter(dot => dot.x > at)
-                .reduce((acc, dot) => {
-                    acc.delete(dot.key)
-                    const newDot = new Point(2 * at - dot.x, dot.y)
-                    acc.set(newDot.key, newDot)
-                    return acc
-            }, new Map<string, Point>(dots))
-        }
-        else if (type == FoldType.Up) {
-            // Subtract (y - at) from each dot where y > at
-            return [...dots.values()]
-                .filter(dot => dot.y > at)
-                .reduce((acc, dot) => {
-                    acc.delete(dot.key)
-                    const newDot = new Point(dot.x, 2 * at - dot.y)
-                    acc.set(newDot.key, newDot)
-                    return acc
-                }, new Map<string, Point>(dots))
-        }
-
-        throw "Invalid fold type"
     }
 
     enum FoldType {
@@ -121,33 +137,5 @@ fold along x=5
         }
     }
 
-    async function getInputDataAsync(): Promise<{ startTime: number, data: { folds: Fold[], dots: Map<string, Point> }}> {
-        var lines: string[]
-        if (DEBUG) {
-            lines = SAMPLE_DATA.split('\n').filter(line => line != "").map(line => line.trim())
-        }
-        else {
-            const response = await got.default(URI_INPUT, { headers: { Cookie: AOC_AUTHN_COOKIES } })
-            lines = response.body.split('\n').filter(line => line != "").map(line => line.trim())
-        }
-
-        var startTime = performance.now()
-
-        const points = lines.filter(line =>
-            line.indexOf(",") > 0)
-                .map(line => line.split(",").map(token => parseInt(token)))
-                .map(tokens => new Point(tokens[0], tokens[1]))
-                .reduce((acc, c) => acc.set(c.key, c), new Map<string, Point>())
-        const folds = lines
-            .filter(line => line.startsWith("fold"))
-            .map(line =>
-                line.slice(11).split("="))
-                    .map(tokens => tokens[0] == "y"
-                        ? new Fold(FoldType.Up, parseInt(tokens[1]))
-                        : new Fold(FoldType.Left, parseInt(tokens[1])))
-
-        return { startTime: startTime, data: { folds: folds, dots: points} }
-    }
-
-    (async () => await main())();
+    (async () => await new Solution().executeAsync())();
 }

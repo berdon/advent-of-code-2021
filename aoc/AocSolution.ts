@@ -23,15 +23,21 @@ export default abstract class AocSolution<T> {
 
         const data = await this.getInputDataAsync()
 
+        console.log(`# Problem ${this.day}\n`)
+
+        console.log(`## Part 1`)
         var startTime = performance.now()
         const { message: partOneMessage, context } = await this.solvePartOneAsync(data)
         var elapsed = (performance.now() - startTime).toFixed(2)
-        console.log(`Part 1: ${partOneMessage} (${elapsed} ms)`)
+        if (partOneMessage != null && partOneMessage != "")
+            console.log(`${partOneMessage} (${elapsed} ms)`)
 
+        console.log(`\n## Part 2`)
         var startTime = performance.now()
         var partTwoMessage = await this.solvePartTwoAsync(data, context)
         var elapsed = (performance.now() - startTime).toFixed(2)
-        console.log(`Part 2: ${partTwoMessage} (${elapsed} ms)`)
+        if (partTwoMessage != null && partTwoMessage != "")
+            console.log(`${partTwoMessage} (${elapsed} ms)`)
     }
 
     private setupProcessStdoutRedirect() {
