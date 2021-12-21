@@ -4,6 +4,8 @@ namespace Problem01 {
     type DataType = number[]
     class Solution extends AocSolution<DataType> {
         public day: string = "01"
+        protected DEBUG: boolean = false
+        protected SHOW_WORK: boolean = false
 
         public async solvePartOneAsync(depthReadings: DataType): Promise<{ message: string, context?: any }> {
             const increasedReadings = depthReadings

@@ -5,6 +5,8 @@ namespace Problem07 {
     type DataType = number[]
     class Solution extends AocSolution<DataType> {
         public day: string = "07"
+        protected DEBUG: boolean = false
+        protected SHOW_WORK: boolean = false
 
         public async solvePartOneAsync(data: DataType): Promise<{ message: string, context?: any }> {
             var position = this.optimalPosition(data, (targetPoint, p, c, i) => p + Math.abs(targetPoint - c))

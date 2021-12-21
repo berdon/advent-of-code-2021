@@ -4,6 +4,8 @@ namespace Problem02 {
     type DataType = { direction: "forward" | "down" | "up"; amount: number; }[]
     class Solution extends AocSolution<DataType> {
         public day: string = "02"
+        protected DEBUG: boolean = false
+        protected SHOW_WORK: boolean = false
 
         public async solvePartOneAsync(data: DataType): Promise<{ message: string, context?: any }> {
             var horizontalPosition = 0

@@ -4,6 +4,8 @@ namespace Problem05 {
     type DataType = Line[]
     class Solution extends AocSolution<DataType> {
         public day: string = "05"
+        protected DEBUG: boolean = false
+        protected SHOW_WORK: boolean = false
 
         public async solvePartOneAsync(data: DataType): Promise<{ message: string, context?: any }> {
             var existingPoints: { [Key: string]: number } = {}

@@ -4,6 +4,8 @@ namespace Problem06 {
     type DataType = School
     class Solution extends AocSolution<DataType> {
         public day: string = "06"
+        protected DEBUG: boolean = false
+        protected SHOW_WORK: boolean = false
 
         public async solvePartOneAsync(school: DataType): Promise<{ message: string, context?: any }> {
             for (var i = 0; i < 80; i++) {

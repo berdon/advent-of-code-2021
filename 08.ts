@@ -7,6 +7,8 @@ namespace Problem08 {
 
     class Solution extends AocSolution<DataType> {
         public day: string = "08"
+        protected DEBUG: boolean = false
+        protected SHOW_WORK: boolean = false
 
         public async solvePartOneAsync(data: DataType): Promise<{ message: string, context?: any }> {
             var uniqueOutputCount = data.reduce((p, c) => p + c.output.filter(o => o.length == 2 || o.length == 3 || o.length == 4 || o.length == 7).length, 0)

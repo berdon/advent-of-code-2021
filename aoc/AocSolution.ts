@@ -6,9 +6,9 @@ import * as fsAsync from 'fs/promises'
 const URI_INPUT = (day: string) => `https://adventofcode.com/2021/day/${day.replace(/^0*/, "")}/input`
 
 export default abstract class AocSolution<T> {
-    protected readonly DEBUG: boolean = false
-    protected readonly SHOW_WORK: boolean = false
     protected readonly AOC_AUTHN_COOKIES = AOC_AUTHN_COOKIES
+    protected abstract DEBUG: boolean
+    protected abstract SHOW_WORK: boolean
     protected get inputFilename(): string { return `input/input-${this.day}.txt` }
     protected get outputFilename(): string { return `output/output-${this.day}.md` }
 

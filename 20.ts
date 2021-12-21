@@ -4,6 +4,8 @@ namespace Problem20 {
     type DataType = { lookup: string[], input: string[][]}
     class Solution extends AocSolution<DataType> {
         public day: string = "20"
+        protected DEBUG: boolean = false
+        protected SHOW_WORK: boolean = false
 
         public async solvePartOneAsync(data: { lookup: string[]; input: string[][]; }): Promise<{ message: string, context: any }> {
             const enhancedOne = this.enhance(data.lookup, data.input, ".")

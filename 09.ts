@@ -4,6 +4,8 @@ namespace Problem09 {
     type DataType = number[][]
     class Solution extends AocSolution<DataType> {
         public day: string = "09"
+        protected DEBUG: boolean = false
+        protected SHOW_WORK: boolean = false
 
         public async solvePartOneAsync(data: DataType): Promise<{ message: string, context?: any }> {
             var coloredData = data.map(row => row.map(c => ({ v: c, c: "black" })))

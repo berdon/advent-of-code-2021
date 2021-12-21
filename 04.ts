@@ -4,6 +4,8 @@ namespace Problem04 {
     type DataType = { InputData: number[], Boards: Board[] }
     class Solution extends AocSolution<DataType> {
         public day: string = "04"
+        protected DEBUG: boolean = false
+        protected SHOW_WORK: boolean = false
 
         public async solvePartOneAsync(data: DataType): Promise<{ message: string, context?: any }> {
             // Iterate through all input and find a winning board
