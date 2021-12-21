@@ -1,11 +1,46 @@
-import AOC_AUTHN_COOKIES from './authtoken.json';
-import * as got from "got"
+import AocSolution from './aoc/AocSolution';
 
 namespace Problem05 {
-    const DEBUG = false
-    const URI_INPUT = "https://adventofcode.com/2021/day/5/input"
-    const URI_SUBMIT = "https://adventofcode.com/2021/day/5/answer"
-    const SAMPLE_DATA = 
+    type DataType = Line[]
+    class Solution extends AocSolution<DataType> {
+        public day: string = "05"
+
+        public async solvePartOneAsync(data: DataType): Promise<{ message: string, context?: any }> {
+            var existingPoints: { [Key: string]: number } = {}
+            const hvLines = data.filter(line => line.category != "mixed")
+            for (var i = 0; i < hvLines.length; i++) {
+                var basePoint = hvLines[i]
+                for(var point of basePoint.points()) {
+                    const key = point.toString()
+                    existingPoints[key] = key in existingPoints ? existingPoints[key] + 1 : 1
+                }
+            }
+
+            var crossedPoints = Object.keys(existingPoints).filter(key => existingPoints[key] >= 2)
+            return { message: `${crossedPoints.length} points overlap` }
+        }
+
+        public async solvePartTwoAsync(data: DataType, context: any): Promise<string> {
+            var existingPoints: { [Key: string]: number } = {}
+            const allLines = data
+            for (var i = 0; i < allLines.length; i++) {
+                var basePoint = allLines[i]
+                for(var point of basePoint.points()) {
+                    const key = point.toString()
+                    existingPoints[key] = key in existingPoints ? existingPoints[key] + 1 : 1
+                }
+            }
+
+            var crossedPoints = Object.keys(existingPoints).filter(key => existingPoints[key] >= 2)
+            return `${crossedPoints.length} points overlap`
+        }
+
+        protected parseData(lines: string[]): DataType {
+            const data = lines.map(line => line.split(" -> ").map(point => new Point(point.split(",").map(n => parseInt(n))))).map(points => new Line(points[0], points[1]))
+            return data
+        }
+
+        protected SAMPLE_DATA: string = 
 `
 0,9 -> 5,9
 8,0 -> 0,8
@@ -18,66 +53,6 @@ namespace Problem05 {
 0,0 -> 8,8
 5,5 -> 8,2
 `;
-    async function main() {
-        // Part 1
-        var { startTime, data } = await getInputDataAsync()
-        var existingPoints: { [Key: string]: number } = {}
-        const hvLines = data.filter(line => line.category != "mixed")
-        for (var i = 0; i < hvLines.length; i++) {
-            var basePoint = hvLines[i]
-            for(var point of basePoint.points()) {
-                const key = point.toString()
-                existingPoints[key] = key in existingPoints ? existingPoints[key] + 1 : 1
-            }
-        }
-
-        var crossedPoints = Object.keys(existingPoints).filter(key => existingPoints[key] >= 2)
-        var elapsed = (performance.now() - startTime).toFixed(2)
-        console.log(`Part 1: ${crossedPoints.length} points overlap (${elapsed} ms)`)
-
-        startTime = performance.now()
-        var existingPoints: { [Key: string]: number } = {}
-        const allLines = data
-        for (var i = 0; i < allLines.length; i++) {
-            var basePoint = allLines[i]
-            for(var point of basePoint.points()) {
-                const key = point.toString()
-                existingPoints[key] = key in existingPoints ? existingPoints[key] + 1 : 1
-            }
-        }
-
-        var crossedPoints = Object.keys(existingPoints).filter(key => existingPoints[key] >= 2)
-        var elapsed = (performance.now() - startTime).toFixed(2)
-        console.log(`Part 2: ${crossedPoints.length} points overlap (${elapsed} ms)`)
-    }
-
-    async function submitAnswerAsync(value: string, part: string) {
-        try {
-            const response = await got.post(URI_SUBMIT, {
-                json: { level: part, answer: value } as any,
-                headers: { Cookie: AOC_AUTHN_COOKIES }
-            })
-            console.log(response.statusCode);
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    async function getInputDataAsync(): Promise<{ startTime: number, data: Line[]}> {
-        var lines: string[]
-        if (DEBUG) {
-            lines = SAMPLE_DATA.split('\n').filter(line => line != "").map(line => line.trim())
-        }
-        else {
-            const response = await got.default(URI_INPUT, { headers: { Cookie: AOC_AUTHN_COOKIES } })
-            lines = response.body.split('\n').filter(line => line != "").map(line => line.trim())
-        }
-
-        var startTime = performance.now()
-
-        const data = lines.map(line => line.split(" -> ").map(point => new Point(point.split(",").map(n => parseInt(n))))).map(points => new Line(points[0], points[1]))
-
-        return { startTime: startTime, data: data }
     }
 
     class Point {
@@ -166,5 +141,5 @@ namespace Problem05 {
         }
     }
 
-    (async () => await main())();
+    (async () => await new Solution().executeAsync())();
 }

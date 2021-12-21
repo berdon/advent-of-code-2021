@@ -1,7 +1,75 @@
-import AOC_AUTHN_COOKIES from './authtoken.json';
-import * as got from "got"
+import AocSolution from './aoc/AocSolution';
 
 namespace Problem04 {
+    type DataType = { InputData: number[], Boards: Board[] }
+    class Solution extends AocSolution<DataType> {
+        public day: string = "04"
+
+        public async solvePartOneAsync(data: DataType): Promise<{ message: string, context?: any }> {
+            // Iterate through all input and find a winning board
+            var winningBoard: Board|undefined
+            data.InputData.find(input => {
+                winningBoard = data.Boards.find(board => board.acceptInput(input))
+                return !!winningBoard
+            })
+            return { message: `Score of winning board is ${winningBoard?.score}` }
+        }
+
+        public async solvePartTwoAsync(data: DataType): Promise<string> {
+            var winningBoard: Board|undefined
+            data.InputData.find(input => {
+                winningBoard = data.Boards
+                    .filter(board => board.score == 0)
+                    .find((board, _, values) => board.acceptInput(input) && values.length == 1)
+                return !!winningBoard
+            })
+            return `Score of last winning board is ${winningBoard?.score}`
+        }
+
+        protected parseData(lines: string[]): DataType {
+            var randomInputLine = lines.shift()!
+            var randomInput = randomInputLine.trim().split(',').map(x => parseInt(x.trim()))
+
+            // Random input data
+            const boards = Array()
+            var currentBoard: Board|null = null
+            lines
+                .map(line => line.trim().split(/[ ]+/).map(x => parseInt(x.trim())))
+                .forEach((current, index, values) => {
+                    currentBoard = currentBoard ?? new Board(index, current.length)
+                    if (currentBoard.addRow(current)) {
+                        boards.push(currentBoard)
+                        currentBoard = new Board(index, current.length)
+                    }
+                })
+
+            return { InputData: randomInput, Boards: boards }
+        }
+
+        protected SAMPLE_DATA: string = 
+`
+7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
+
+22 13 17 11  0
+ 8  2 23  4 24
+21  9 14 16  7
+ 6 10  3 18  5
+ 1 12 20 15 19
+
+ 3 15  0  2 22
+ 9 18 13 17  5
+19  8  7 25 23
+20 11 10 24  4
+14 21 16 12  6
+
+14 21 17 24  4
+10 16 15  9 19
+18  8 23 26 20
+22 11 13  6  5
+ 2  0 12  3  7
+`;
+    }
+
     class Board {
         // The board index
         index: number
@@ -79,98 +147,5 @@ namespace Problem04 {
         }
     }
 
-    const DEBUG = false
-    const URI_INPUT = "https://adventofcode.com/2021/day/4/input"
-    const URI_SUBMIT = "https://adventofcode.com/2021/day/4/answer"
-    const SAMPLE_DATA = 
-`
-7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
-
-22 13 17 11  0
- 8  2 23  4 24
-21  9 14 16  7
- 6 10  3 18  5
- 1 12 20 15 19
-
- 3 15  0  2 22
- 9 18 13 17  5
-19  8  7 25 23
-20 11 10 24  4
-14 21 16 12  6
-
-14 21 17 24  4
-10 16 15  9 19
-18  8 23 26 20
-22 11 13  6  5
- 2  0 12  3  7
-`;
-
-    (async() => {
-        // ### Part 1
-        var { startTime, data } = await getInputDataAsync()
-        // Iterate through all input and find a winning board
-        var winningBoard: Board|undefined
-        data.InputData.find(input => {
-            winningBoard = data.Boards.find(board => board.acceptInput(input))
-            return !!winningBoard
-        })
-        var elapsed = (performance.now() - startTime).toFixed(2)
-        console.log(`Part 1: Score of winning board is ${winningBoard?.score} (${elapsed} ms)`)
-
-        // ### Part 2
-        // Iterate through all input and find a winning board
-        startTime = performance.now()
-        var winningBoard: Board|undefined
-        data.InputData.find(input => {
-            winningBoard = data.Boards
-                .filter(board => board.score == 0)
-                .find((board, index, values) => board.acceptInput(input) && values.length == 1)
-            return !!winningBoard
-        })
-        elapsed = (performance.now() - startTime).toFixed(2)
-        console.log(`Part 2: Score of last winning board is ${winningBoard?.score} (${elapsed} ms)`)
-    })();
-
-    async function submitAnswerAsync(value: string, part: string) {
-        try {
-            const response = await got.post(URI_SUBMIT, {
-                json: { level: part, answer: value } as any,
-                headers: { Cookie: AOC_AUTHN_COOKIES }
-            })
-            console.log(response.statusCode);
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    async function getInputDataAsync(): Promise<{ startTime: number, data: {InputData: number[], Boards: Board[]}}> {
-        var lines: string[]
-        if (DEBUG) {
-            lines = SAMPLE_DATA.split('\n').filter(line => line != "")
-        }
-        else {
-            const response = await got.default(URI_INPUT, { headers: { Cookie: AOC_AUTHN_COOKIES } })
-            lines = response.body.split('\n').filter(line => line != "")
-        }
-
-        var startTime = performance.now()
-
-        var randomInputLine = lines.shift()!
-        var randomInput = randomInputLine.trim().split(',').map(x => parseInt(x.trim()))
-
-        // Random input data
-        const boards = Array()
-        var currentBoard: Board|null = null
-        lines
-            .map(line => line.trim().split(/[ ]+/).map(x => parseInt(x.trim())))
-            .forEach((current, index, values) => {
-                currentBoard = currentBoard ?? new Board(index, current.length)
-                if (currentBoard.addRow(current)) {
-                    boards.push(currentBoard)
-                    currentBoard = new Board(index, current.length)
-                }
-            })
-
-        return { startTime: startTime, data: { InputData: randomInput, Boards: boards } }
-    }
+    (async () => await new Solution().executeAsync())();
 }

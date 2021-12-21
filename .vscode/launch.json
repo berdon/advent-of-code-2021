@@ -13,7 +13,8 @@
         "outFiles": ["${fileDirname}/out/**/*.js"],
         "sourceMaps": true,
         "smartStep": true,
-        "internalConsoleOptions": "openOnSessionStart"
+        "internalConsoleOptions": "openOnSessionStart",
+        "console": "integratedTerminal"
       }
     ]
   }

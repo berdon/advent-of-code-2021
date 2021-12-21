@@ -1,62 +1,34 @@
-import AOC_AUTHN_COOKIES from './authtoken.json';
-import * as got from "got"
+import AocSolution from './aoc/AocSolution';
 
 namespace Problem06 {
-    const DAY = 6;
-    const DEBUG = false
-    const URI_INPUT = `https://adventofcode.com/2021/day/${DAY}/input`
-    const URI_SUBMIT = `https://adventofcode.com/2021/day/${DAY}/answer`
-    const SAMPLE_DATA = `3,4,3,1,2`;
-    async function main() {
-        // Part 1
-        var { startTime, data: school } = await getInputDataAsync()
-        var elapsed = (performance.now() - startTime).toFixed(2)
+    type DataType = School
+    class Solution extends AocSolution<DataType> {
+        public day: string = "06"
 
-        for (var i = 0; i < 80; i++) {
-            school.tick()
+        public async solvePartOneAsync(school: DataType): Promise<{ message: string, context?: any }> {
+            for (var i = 0; i < 80; i++) {
+                school.tick()
+            }
+            return { message: `There are ${school.count()} fish` }
         }
 
-        console.log(`Part 1: There are ${school.count()} fish (${elapsed} ms)`)
-
-        var startTime = performance.now()
-        for (var i = 80; i < 256; i++) {
-            school.tick()
+        public async solvePartTwoAsync(school: DataType): Promise<string> {
+            for (var i = 80; i < 256; i++) {
+                school.tick()
+            }
+            return `There are ${school.count()} fish`
         }
-        var elapsed = (performance.now() - startTime).toFixed(2)
-        console.log(`Part 2: There are ${school.count()} fish (${elapsed} ms)`)
-    }
 
-    async function submitAnswerAsync(value: string, part: string) {
-        try {
-            const response = await got.post(URI_SUBMIT, {
-                json: { level: part, answer: value } as any,
-                headers: { Cookie: AOC_AUTHN_COOKIES }
+        protected parseData(lines: string[]): DataType {
+            var fishPool: Fish[] = Array(7).fill(0).map(_ => new Fish())
+            lines[0].split(",").map(x => parseInt(x)).forEach(timer => {
+                fishPool[timer].count++
             })
-            console.log(response.statusCode);
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    async function getInputDataAsync(): Promise<{ startTime: number, data: School}> {
-        var lines: string[]
-        if (DEBUG) {
-            lines = SAMPLE_DATA.split('\n').filter(line => line != "").map(line => line.trim())
-        }
-        else {
-            const response = await got.default(URI_INPUT, { headers: { Cookie: AOC_AUTHN_COOKIES } })
-            lines = response.body.split('\n').filter(line => line != "").map(line => line.trim())
+            const data = new School(fishPool)
+            return data
         }
 
-        var startTime = performance.now()
-
-        var fishPool: Fish[] = Array(7).fill(0).map(_ => new Fish())
-        lines[0].split(",").map(x => parseInt(x)).forEach(timer => {
-            fishPool[timer].count++
-        })
-        const data = new School(fishPool)
-
-        return { startTime: startTime, data: data }
+        protected SAMPLE_DATA: string = `3,4,3,1,2`
     }
 
     class Fish {
@@ -93,5 +65,5 @@ namespace Problem06 {
         }
     }
 
-    (async () => await main())();
+    (async () => await new Solution().executeAsync())();
 }
