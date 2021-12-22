@@ -1,52 +1,78 @@
-import AOC_AUTHN_COOKIES from './authtoken.json';
-import * as got from "got"
+import AocSolution from './aoc/AocSolution';
 import Console from './console'
-import PriorityQueue from 'ts-priority-queue'
 
 namespace Problem16 {
-    const DAY = 16;
-    const DEBUG = false
-    const URI_INPUT = `https://adventofcode.com/2021/day/${DAY}/input`
-    const SAMPLE_DATA = 
-`
-880086C3E88112
-`;
-    async function main() {
-        // Part 1
-        var { startTime, data } = await getInputDataAsync()
-        const packet = readPacket(data)
-        const versionSum = totalVersion(packet)
-        var elapsed = (performance.now() - startTime).toFixed(2)
-        console.log(`Part 1: Total version sum is ${versionSum} (${elapsed} ms)`)
+    type DataType = number[]
+    class Solution extends AocSolution<DataType> {
+        public day: string = "16"
+        protected DEBUG: boolean = false
+        protected SHOW_WORK: boolean = false
 
-        // Part 2
-        var startTime = performance.now()
-        const value = packet.getValue()
-        var elapsed = (performance.now() - startTime).toFixed(2)
-        console.log(`Part 2: Operation value is ${value} (${elapsed} ms)`)
-    }
+        public async solvePartOneAsync(data: DataType): Promise<{ message: string, context?: any }> {
+            const packet = readPacket(data)
+            const versionSum = this.totalVersion(packet)
+            return { message: `Total version sum is ${versionSum}`, context: packet }
+        }
 
-    function display(graph: number[][], path: { key: string, risk: number }[]) {
-        const pathKeys = new Set<string>(path.map(pair => pair.key))
-        for(var y = 0; y < graph.length; y++) {
-            for (var x = 0; x < graph[0].length; x++) {
-                const key = `${x},${y}`
-                if (pathKeys.has(key))
-                    process.stdout.write(`${Console.FgWhite}${graph[y][x]}${Console.Reset}`);
-                else
-                    process.stdout.write(`${Console.Dim}${graph[y][x]}${Console.Reset}`);
+        public async solvePartTwoAsync(data: DataType, packet: Packet): Promise<string> {
+            const value = packet.getValue()
+            return `Operation value is ${value}`
+        }
+
+        private display(graph: number[][], path: { key: string, risk: number }[]) {
+            const pathKeys = new Set<string>(path.map(pair => pair.key))
+            for(var y = 0; y < graph.length; y++) {
+                for (var x = 0; x < graph[0].length; x++) {
+                    const key = `${x},${y}`
+                    if (pathKeys.has(key))
+                        process.stdout.write(`${Console.FgWhite}${graph[y][x]}${Console.Reset}`);
+                    else
+                        process.stdout.write(`${Console.Dim}${graph[y][x]}${Console.Reset}`);
+                }
+                console.log("")
             }
-            console.log("")
         }
+    
+        private totalVersion(packet: Packet, version = 0): number {
+            if (packet instanceof LiteralPacket) {
+                return version + (packet as LiteralPacket).version
+            }
+            else {
+                return (packet as OperatorPacket).version + (packet as OperatorPacket).packets.reduce((acc, c) => this.totalVersion(c, acc), version)
+            }
+        }
+
+        protected parseData(lines: string[]): DataType {
+            const data = lines[0]
+                .split("")
+            const hex = data.map(x => parseInt(x, 16))
+            const bitBlocks = hex.map(x => (x >>> 0).toString(2).padStart(4, '0').split("").map(y => parseInt(y)))
+                .flat().flat()
+            return bitBlocks
+        }
+
+        protected SAMPLE_DATA: string = `880086C3E88112`;
     }
 
-    function totalVersion(packet: Packet, version = 0): number {
-        if (packet instanceof LiteralPacket) {
-            return version + (packet as LiteralPacket).version
+    function readPacket(data: number[]): Packet {
+        const version = readNumber(data, 3)
+        const type = readNumber(data, 3)
+        switch (type) {
+            case 4: return new LiteralPacket(version, data)
+            default: return new OperatorPacket(version, type, data)
         }
-        else {
-            return (packet as OperatorPacket).version + (packet as OperatorPacket).packets.reduce((acc, c) => totalVersion(c, acc), version)
-        }
+
+        throw "Invalid packet type"
+    }
+
+    function readBits(data: number[], count: number): string {
+        if (count == 0) return ""
+        return data.splice(0, count).reduce((acc, c) => acc + c, "")
+    }
+
+    function readNumber(data: number[], count: number): number {
+        if (count == 0) return 0
+        return parseInt(data.splice(0, count).reduce((acc, c) => acc + c, ""), 2)
     }
 
     abstract class Packet {
@@ -116,47 +142,5 @@ namespace Problem16 {
         }
     }
 
-    function readPacket(data: number[]): Packet {
-        const version = readNumber(data, 3)
-        const type = readNumber(data, 3)
-        switch (type) {
-            case 4: return new LiteralPacket(version, data)
-            default: return new OperatorPacket(version, type, data)
-        }
-
-        throw "Invalid packet type"
-    }
-
-    function readBits(data: number[], count: number): string {
-        if (count == 0) return ""
-        return data.splice(0, count).reduce((acc, c) => acc + c, "")
-    }
-
-    function readNumber(data: number[], count: number): number {
-        if (count == 0) return 0
-        return parseInt(data.splice(0, count).reduce((acc, c) => acc + c, ""), 2)
-    }
-
-    async function getInputDataAsync(): Promise<{ startTime: number, data: number[]}> {
-        var lines: string[]
-        if (DEBUG) {
-            lines = SAMPLE_DATA.split('\n').filter(line => line != "").map(line => line.trim())
-        }
-        else {
-            const response = await got.default(URI_INPUT, { headers: { Cookie: AOC_AUTHN_COOKIES } })
-            lines = response.body.split('\n').filter(line => line != "").map(line => line.trim())
-        }
-
-        var startTime = performance.now()
-
-        const data = lines[0]
-            .split("")
-        const hex = data.map(x => parseInt(x, 16))
-        const bitBlocks = hex.map(x => (x >>> 0).toString(2).padStart(4, '0').split("").map(y => parseInt(y)))
-            .flat()
-
-        return { startTime: startTime, data: bitBlocks.flat() }
-    }
-
-    (async () => await main())();
+    (async () => await new Solution().executeAsync())();
 }

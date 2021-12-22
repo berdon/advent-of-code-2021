@@ -1,2 +1,7 @@
-Part 1: Number of viable paths is 3856 (39.13 ms)
-Part 2: Number of viable paths is 116692 (1456.49 ms)
+# Problem 12
+
+## Part 1
+Number of viable paths is 3856 (41.98 ms)
+
+## Part 2
+Number of viable paths is 116692 (1349.44 ms)

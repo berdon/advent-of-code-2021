@@ -1,1 +1,7 @@
-Part 1: Product of gamma and epsilon is 0; (-1 x 0) (2.38 ms)
+# Problem 20
+
+## Part 1
+Lit pixels after two enhancements is 5597 (29.69 ms)
+
+## Part 2
+Lit pixels after two enhancements is 18723 (1570.82 ms)
