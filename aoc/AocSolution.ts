@@ -56,6 +56,10 @@ export default abstract class AocSolution<T> {
 
     protected abstract parseData(lines: string[]): T
 
+    protected cleanLine(line: string): string {
+        return line.trim()
+    }
+
     protected async getInputDataAsync(): Promise<T> {
         var raw: string
         if (this.DEBUG) {
@@ -69,10 +73,8 @@ export default abstract class AocSolution<T> {
             raw = response.body
             await fsAsync.writeFile(this.inputFilename, raw)
         }
-        const lines = raw.split('\n').filter(line => line != "").map(line => line.trim())
-
+        const lines = raw.split('\n').filter(line => line != "").map(this.cleanLine)
         const data = this.parseData(lines)
-
         return data
     }
 }
